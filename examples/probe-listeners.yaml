@@ -1,0 +1,14 @@
+# Merge into a dedicated probe Mihomo instance on the home egress network.
+# PROBE_PROXY must exist and contain real proxy nodes, with no DIRECT fallback.
+# Probe requests must bypass RouterOS transparent-proxy/PBR rules on egress.
+listeners:
+  - name: probe-direct
+    type: mixed
+    listen: 127.0.0.1
+    port: 17890
+    proxy: DIRECT
+  - name: probe-proxy
+    type: mixed
+    listen: 127.0.0.1
+    port: 17891
+    proxy: PROBE_PROXY

@@ -1,0 +1,2 @@
+# Custom reject / block rules
+DOMAIN,blocked.example.invalid

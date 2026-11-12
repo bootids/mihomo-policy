@@ -1,0 +1,22 @@
+cases:
+  - host: gemini.google.com
+    category: ai
+    policy: 境外AI
+  - host: generativelanguage.googleapis.com
+    category: ai
+    policy: 境外AI
+  - host: www.google.com
+    category: google
+    policy: Google
+  - host: www.youtube.com
+    category: youtube
+    policy: YouTube
+  - host: youtubei.googleapis.com
+    category: youtube
+    policy: YouTube
+  - host: not-google.com
+    category: fallback
+    policy: 其他
+  - host: kimi.com
+    category: direct
+    policy: DIRECT

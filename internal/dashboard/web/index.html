@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Mihomo Policy</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="#overview">
+    <span class="brand-icon" aria-hidden="true">m<span>p</span></span>
+    <span class="brand-copy">Mihomo<span class="brand-sub">POLICY CONSOLE</span></span>
+  </a>
+  <div class="nav-label">导航</div>
+  <nav aria-label="主要导航">
+    <a href="#overview" data-page="overview">
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span>流量概览</span>
+    </a>
+    <a href="#candidates" data-page="candidates">
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+      <span>域名统计与直连</span>
+      <span id="nav-count" class="nav-count">0</span>
+    </a>
+    <a href="#rules" data-page="rules">
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M2 13l10 5 10-5"/><path d="M2 18l10 5 10-5"/></svg>
+      <span>分类与规则</span>
+    </a>
+    <a href="#tasks" data-page="tasks">
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+      <span>发布与运行</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-links">
+      <a href="https://wiki.metacubex.one/" target="_blank" rel="noreferrer">Mihomo 文档 ↗</a>
+      <span class="kbd-hint" title="支持数字键 1-4 切换页面，/ 快速搜索">快捷键 <code>1-4</code> <code>/</code></span>
+    </div>
+  </div>
+</aside>
+
+<div class="workspace">
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>Mihomo Policy</span>
+      <span class="sep" aria-hidden="true">/</span>
+      <strong id="breadcrumb">流量概览</strong>
+    </div>
+    <div class="top-actions">
+      <button id="open-git-dialog" class="button mini" type="button" title="提交并推送本地规则修改到 GitHub">
+        <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6m3-9h4a5 5 0 0 1 5 5"/></svg>
+        <span>提交并 Push</span>
+        <span id="git-dirty-badge" class="pill-count" hidden>0</span>
+      </button>
+      <button id="open-deploy-dialog" class="button mini primary" type="button" title="同步 config.yaml 到 admin@10.10.10.1 与 admin@10.10.8.1">
+        <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0l-4 4m4-4l4 4"/><path d="M5 20h14"/></svg>
+        <span>同步双路由配置</span>
+      </button>
+      <span class="source-pill" id="source" title="当前数据源">HOME</span>
+      <span class="connection-pill" id="connection">连接中</span>
+      <button id="theme-toggle" class="icon-btn" type="button" title="切换外观主题" aria-label="切换外观主题">
+        <svg id="theme-icon" class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-heading">
+      <div>
+        <h1 id="page-title">流量概览</h1>
+      </div>
+      <div class="heading-actions">
+        <div class="segmented" role="group" aria-label="域名聚合层级">
+          <button type="button" class="seg-btn level-btn active" data-level="l1">一级域名 <span id="level-count-l1" class="seg-count">0</span></button>
+          <button type="button" class="seg-btn level-btn" data-level="l2">二级域名 <span id="level-count-l2" class="seg-count">0</span></button>
+          <button type="button" class="seg-btn level-btn" data-level="host">完整域名 <span id="level-count-host" class="seg-count">0</span></button>
+        </div>
+        <div class="segmented" role="group" aria-label="统计时间范围">
+          <button type="button" class="seg-btn period-btn" data-hours="24">24 小时</button>
+          <button type="button" class="seg-btn period-btn active" data-hours="168">7 天</button>
+          <button type="button" class="seg-btn period-btn" data-hours="720">30 天</button>
+        </div>
+        <label class="sr-only" for="period">统计时间</label>
+        <select id="period" hidden>
+          <option value="24">24 小时</option>
+          <option value="168" selected>7 天</option>
+          <option value="720">30 天</option>
+        </select>
+        <button id="refresh" class="button" type="button" title="刷新数据 (快捷键 R)">
+          <svg id="refresh-icon" class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          <span>刷新</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="error" class="error-banner" role="alert" hidden></div>
+
+    <section id="page-overview" class="page">
+      <div class="stats-grid">
+        <article class="stat" data-tone="accent">
+          <div class="stat-head">
+            <span>总流量</span>
+            <span class="stat-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg>
+            </span>
+          </div>
+          <strong id="stat-traffic" class="tabular">—</strong>
+          <p id="stat-traffic-sub">—</p>
+        </article>
+        <article class="stat" data-tone="blue">
+          <div class="stat-head">
+            <span>活跃域名</span>
+            <span class="stat-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 0 0 0 18 14.5 14.5 0 0 0 0-18z"/></svg>
+            </span>
+          </div>
+          <strong id="stat-domains" class="tabular">—</strong>
+          <p id="stat-domain-sub">—</p>
+        </article>
+        <article class="stat stat-interactive" data-tone="amber" data-goto="candidates" tabindex="0" role="button" aria-label="查看测试通过可加直连域名">
+          <div class="stat-head">
+            <span>直连测试通过</span>
+            <span class="stat-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+            </span>
+          </div>
+          <strong id="stat-suggestions" class="tabular">—</strong>
+          <p id="stat-suggestions-sub">待评估 — · 已忽略 —</p>
+        </article>
+        <article class="stat stat-interactive" data-tone="slate" data-goto="tasks" tabindex="0" role="button" aria-label="查看采集与同步状态">
+          <div class="stat-head">
+            <span>采集状态</span>
+            <span class="stat-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </span>
+          </div>
+          <strong id="stat-collection">—</strong>
+          <p id="stat-last-sample">—</p>
+        </article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>分类流量占比</h2>
+            <a class="panel-link" href="#rules">分类规则 ↗</a>
+          </div>
+          <div id="service-bars" class="service-bars"></div>
+        </article>
+
+        <article class="panel panel-flex">
+          <div class="panel-heading">
+            <h2>直连评估进度</h2>
+            <a class="panel-link" href="#candidates">去操作 ↗</a>
+          </div>
+          <div id="evidence-summary" class="evidence-summary"></div>
+        </article>
+      </div>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <h2>高流量与异常域名</h2>
+          <a class="panel-link" href="#candidates">查看全部 ↗</a>
+        </div>
+        <div id="overview-table" class="table-wrap"></div>
+      </article>
+    </section>
+
+    <section id="page-candidates" class="page" hidden>
+      <article class="panel">
+        <div class="panel-heading">
+          <h2>域名统计与直连管理</h2>
+          <div class="heading-actions">
+            <button class="button" id="export" type="button">
+              <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              <span>导出 JSON</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="quick-chips" role="tablist" aria-label="状态筛选">
+            <button type="button" class="chip active" data-status="">全部 <span id="chip-all" class="chip-count">0</span></button>
+            <button type="button" class="chip" data-status="pending"><span class="dot amber"></span>待评估 <span id="chip-pending" class="chip-count">0</span></button>
+            <button type="button" class="chip" data-status="passed"><span class="dot green"></span>测试通过 <span id="chip-passed" class="chip-count">0</span></button>
+            <button type="button" class="chip" data-status="direct"><span class="dot blue"></span>已直连 <span id="chip-direct" class="chip-count">0</span></button>
+            <button type="button" class="chip" data-status="ignored">已忽略 <span id="chip-ignored" class="chip-count">0</span></button>
+          </div>
+
+          <div class="filters">
+            <label class="search">
+              <svg class="svg-icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="search" type="search" placeholder="搜索一二级域名、子域名、分类或策略组… (按 /)" aria-label="搜索域名">
+              <button type="button" id="clear-search" class="clear-btn" aria-label="清空搜索" hidden>×</button>
+            </label>
+            <select id="category-filter" aria-label="分类筛选">
+              <option value="">全部分类</option>
+            </select>
+            <select id="status-filter" aria-label="状态筛选" hidden>
+              <option value="">全部</option>
+              <option value="pending">待评估</option>
+              <option value="passed">测试通过</option>
+              <option value="direct">已直连</option>
+              <option value="ignored">已忽略</option>
+            </select>
+            <button type="button" id="reset-filters" class="button ghost" hidden>重置</button>
+          </div>
+        </div>
+
+        <div id="candidate-table" class="table-wrap"></div>
+        <div id="table-count" class="panel-footnote"></div>
+        <div class="pagination">
+          <button id="page-prev" class="button" type="button">上一页</button>
+          <span id="page-number" aria-live="polite">1 / 1</span>
+          <button id="page-next" class="button" type="button">下一页</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="page-rules" class="page" hidden>
+      <article class="panel">
+        <div class="panel-heading">
+          <h2>域名命中查询</h2>
+        </div>
+        <form id="match-form" class="lookup">
+          <div class="lookup-input-wrap">
+            <input id="match-host" placeholder="例如 gemini.google.com" value="gemini.google.com" aria-label="待查询域名" autocomplete="off" spellcheck="false" required>
+          </div>
+          <button class="button primary" type="submit">查询命中</button>
+        </form>
+        <div class="sample-domains" aria-label="示例域名">
+          <span class="muted">示例：</span>
+          <button type="button" class="sample-chip" data-sample="gemini.google.com">gemini.google.com</button>
+          <button type="button" class="sample-chip" data-sample="www.google.com">www.google.com</button>
+          <button type="button" class="sample-chip" data-sample="kimi.com">kimi.com</button>
+          <button type="button" class="sample-chip" data-sample="t.me">t.me</button>
+        </div>
+        <div id="match-result" class="match-result">输入域名查询命中的分类与策略组。</div>
+      </article>
+
+      <div class="section-heading">
+        <h2>分类规则列表</h2>
+        <div class="section-actions">
+          <label class="search compact">
+            <svg class="svg-icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input id="rule-search" type="search" placeholder="检索规则关键字…" aria-label="检索分类规则">
+          </label>
+        </div>
+      </div>
+      <div id="category-cards" class="category-grid"></div>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <h2>跨分类规则重叠</h2>
+          <span id="overlap-count" class="tag neutral">0 项</span>
+        </div>
+        <div id="overlaps" class="table-wrap"></div>
+      </article>
+    </section>
+
+    <section id="page-tasks" class="page" hidden>
+      <div class="overview-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>本地仓库 Git 同步</h2>
+            <span id="git-status-badge" class="tag neutral">检测中</span>
+          </div>
+          <div class="ops-box">
+            <dl id="git-details" class="details-list"></dl>
+            <div class="ops-form">
+              <input id="git-commit-msg" type="text" placeholder="提交说明（留空自动生成）" aria-label="Git 提交说明">
+              <label class="checkbox-inline">
+                <input id="git-refresh-providers" type="checkbox" checked>
+                <span>Push 后通知双路由刷新远程规则集</span>
+              </label>
+              <div class="ops-actions">
+                <button id="run-git-push" class="button primary" type="button">Commit 并 Push 到 GitHub</button>
+              </div>
+            </div>
+            <div id="git-push-output" class="ops-output" hidden></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>路由器 config.yaml 发布</h2>
+            <span class="tag blue">双设备同步</span>
+          </div>
+          <div class="ops-box">
+            <div id="router-targets" class="task-list"></div>
+            <div class="ops-actions">
+              <button id="run-deploy-all" class="button primary" type="button">更新 config.yaml 到 10.10.10.1 与 10.10.8.1</button>
+              <button id="run-publish-all" class="button" type="button">一键 Commit/Push + 更新双路由</button>
+            </div>
+            <div id="deploy-output" class="ops-output" hidden></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>采集器状态</h2>
+            <span id="collector-badge" class="tag neutral">检测中</span>
+          </div>
+          <dl id="collector-details" class="details-list"></dl>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>定时任务</h2>
+          </div>
+          <div id="task-list" class="task-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Mihomo Policy</span>
+      <span id="updated">等待数据</span>
+    </footer>
+  </main>
+</div>
+
+<dialog id="detail-dialog" aria-labelledby="detail-title">
+  <div class="dialog-header">
+    <div class="dialog-title-wrap">
+      <div class="eyebrow" id="detail-level-label">DOMAIN</div>
+      <div class="dialog-host-row">
+        <h2 id="detail-title"></h2>
+        <button id="copy-host" class="button mini" type="button">复制域名</button>
+        <button id="explain-host" class="button mini ghost" type="button">命中查询 ↗</button>
+      </div>
+    </div>
+    <button id="close-dialog" class="icon-button" type="button" aria-label="关闭详情">×</button>
+  </div>
+  <div id="detail-body" class="dialog-body"></div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

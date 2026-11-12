@@ -1,0 +1,66 @@
+# Copy to local/runtime.yaml. Relative paths are resolved from this file.
+source: home
+controller: http://10.10.10.1:9090
+secret_env: MIHOMO_SECRET
+database: ../data/policy.db
+policy_file: ../policy/policy.yaml
+ignore_file: ../policy/ignore.list
+repo_dir: ..
+mihomo_config: ../config.template.yaml
+report_file: ../data/report.json
+git:
+  remote: origin
+  branch: main
+  author_name: Bootis
+  author_email: yxh1316185617@gmail.com
+routers:
+  - name: 10.10.10.1
+    ssh_addr: 10.10.10.1:22
+    ssh_user: admin
+    remote_path: /containers/mihomo/config.yaml
+    controller: http://10.10.10.1:9090
+    secret_env: MIHOMO_SECRET
+    container_config_path: /root/.config/mihomo/config.yaml
+  - name: 10.10.8.1
+    ssh_addr: 10.10.8.1:22
+    ssh_user: admin
+    remote_path: /usb1/mihomo/config.yaml
+    controller: http://10.10.8.1:9090
+    secret_env: ""
+    container_config_path: /root/.config/mihomo/config.yaml
+poll_interval: 1s
+probe_interval: 6h
+report_interval: 24h
+retention: 2160h
+probe_timeout: 15s
+concurrency: 4
+analysis:
+  evidence_lookback: 168h
+  max_age: 12h
+  recent_pairs: 5
+  min_direct_win_rate: 0.5
+  min_pairs: 20
+  min_windows: 3
+  window: 4h
+  min_span: 24h
+  success_rate: 0.95
+  direct_failure_rate: 0.80
+# Enable the web dashboard. For a LAN/container bind, configure a separate password.
+# web:
+#   listen: 0.0.0.0:8080
+#   username: admin
+#   password_env: MIHOMO_DASHBOARD_PASSWORD
+# These must be independent forced-route listeners, NOT the normal 7890 mixed port.
+# They must run on the 10.10.10.1 egress network; localhost assumes a local sidecar.
+# Update this revision after node, DNS or egress changes behind the same listeners.
+# This is an operator revision, not automatically verified egress identity.
+probe_environment: home-egress-v1
+direct_proxy: http://127.0.0.1:17890
+proxy_proxy: http://127.0.0.1:17891
+targets:
+  - name: google-health
+    url: https://www.google.com/generate_204
+    expected_status: [204]
+  - name: gemini-home
+    url: https://gemini.google.com/
+    expected_status: [200]

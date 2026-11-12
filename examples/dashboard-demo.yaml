@@ -1,0 +1,6 @@
+source: home
+database: ../data/demo.db
+policy_file: ../policy/policy.yaml
+report_file: ../data/demo-report.json
+web:
+  listen: 127.0.0.1:18091

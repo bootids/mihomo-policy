@@ -1,0 +1,39 @@
+version: 1
+fallback: 其他
+categories:
+  - name: direct
+    priority: 1100
+    policy: DIRECT
+    files: [rules/direct.list]
+  - name: reject
+    priority: 1050
+    policy: 广告拦截
+    files: [rules/reject.list]
+  - name: ai
+    priority: 1000
+    policy: 境外AI
+    files: [rules/ai.list]
+  - name: youtube
+    priority: 850
+    policy: YouTube
+    files: [rules/youtube.list]
+  - name: google
+    priority: 800
+    policy: Google
+    files: [rules/google.list]
+  - name: telegram
+    priority: 750
+    policy: Telegram
+    files: [rules/telegram.list]
+  - name: github
+    priority: 720
+    policy: Github
+    files: [rules/github.list]
+  - name: apple
+    priority: 700
+    policy: Apple
+    files: [rules/apple.list]
+  - name: microsoft
+    priority: 680
+    policy: 微软服务
+    files: [rules/microsoft.list]

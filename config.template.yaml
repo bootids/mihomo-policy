@@ -1,0 +1,382 @@
+---
+proxy-providers:
+  订阅一:
+    type: http
+    interval: 86400
+    health-check:
+      enable: true
+      url: https://cp.cloudflare.com
+      interval: 300
+      timeout: 1000
+      tolerance: 100
+    proxy: DIRECT
+    path: "./proxy_provider/p1.yaml"
+    url: "${MIHOMO_SUB_URL}"
+
+rule-providers:
+  direct:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/direct.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/direct.list
+    interval: 3600
+  reject:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/reject.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/reject.list
+    interval: 3600
+  AWAvenue-Ads:
+    type: http
+    behavior: domain
+    format: yaml
+    path: "./rule_provider/AWAvenue-Ads.yaml"
+    url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash-Classical.yaml
+    interval: 86400
+  ai:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/ai.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/ai.list
+    interval: 3600
+  youtube:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/youtube.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/youtube.list
+    interval: 3600
+  google:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/google.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/google.list
+    interval: 3600
+  telegram:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/telegram.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/telegram.list
+    interval: 3600
+  github:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/github.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/github.list
+    interval: 3600
+  apple:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/apple.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/apple.list
+    interval: 3600
+  microsoft:
+    type: http
+    behavior: classical
+    format: text
+    path: "./rule_provider/microsoft.list"
+    url: https://raw.githubusercontent.com/bootids/mihomo-policy/refs/heads/main/policy/rules/microsoft.list
+    interval: 3600
+
+mode: rule
+ipv6: true
+log-level: info
+allow-lan: true
+mixed-port: 7890
+unified-delay: true
+tcp-concurrent: true
+external-controller: ":9090"
+external-ui: /root/.config/mihomo/ui
+secret: "${MIHOMO_SECRET}"
+
+listeners:
+  - name: direct-probe
+    type: mixed
+    listen: "::"
+    port: 17890
+    proxy: DIRECT
+
+geodata-mode: true
+geox-url:
+  geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat
+  geosite: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
+  mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb
+
+find-process-mode: strict
+keep-alive-interval: 1800
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+ntp:
+  enable: true
+  write-to-system: false
+  server: time.apple.com
+  port: 123
+  interval: 30
+
+sniffer:
+  enable: true
+  sniff:
+    TLS:
+      ports:
+        - 443
+        - 8443
+    HTTP:
+      ports:
+        - 80
+        - 8080-8880
+      override-destination: true
+
+tun:
+  enable: true
+  stack: system
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  auto-route: true
+  auto-detect-interface: true
+
+dns:
+  enable: true
+  listen: ":53"
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.0/16
+  fake-ip-filter:
+    - "+.z.ai"
+    - "+.bigmodel.cn"
+    - "+.kimi.com"
+    - "+.kimi.ai"
+    - "+.moonshot.cn"
+    - "+.moonshot.ai"
+    - "*"
+    - "+.lan"
+    - "+.local"
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+    - 114.114.114.114
+    - "[2402:4e00::]"
+    - "[2400:3200::1]"
+  nameserver:
+    - tls://8.8.4.4#dns
+    - tls://1.0.0.1#dns
+    - tls://[2001:4860:4860::8844]#dns
+    - tls://[2606:4700:4700::1001]#dns
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+  nameserver-policy:
+    "+.z.ai":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "+.bigmodel.cn":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "+.kimi.com":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "+.kimi.ai":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "+.moonshot.cn":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "+.moonshot.ai":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    geosite:apple,apple-cn:
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    geosite:cn,private:
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    geosite:!cn,!private:
+      - tls://dns.google
+      - tls://cloudflare-dns.com
+
+proxy-groups:
+  - name: 节点选择
+    type: select
+    proxies:
+      - 全部节点
+      - 自动选择
+      - 香港
+      - 台湾
+      - 日本
+      - 新加坡
+      - 美国
+      - 其它地区
+      - DIRECT
+  - name: dns
+    type: select
+    proxies: &group_candidates
+      - 节点选择
+      - 香港
+      - 台湾
+      - 新加坡
+      - 日本
+      - 美国
+      - 其它地区
+      - 全部节点
+      - 自动选择
+      - DIRECT
+  - name: 广告拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+      - 节点选择
+  - name: 境外AI
+    type: select
+    proxies: *group_candidates
+  - name: Apple
+    type: select
+    proxies: *group_candidates
+  - name: Google
+    type: select
+    proxies: *group_candidates
+  - name: Telegram
+    type: select
+    proxies: *group_candidates
+  - name: Twitter
+    type: select
+    proxies: *group_candidates
+  - name: YouTube
+    type: select
+    proxies: *group_candidates
+  - name: NETFLIX
+    type: select
+    proxies: *group_candidates
+  - name: TikTok
+    type: select
+    proxies: *group_candidates
+  - name: Github
+    type: select
+    proxies: *group_candidates
+  - name: Steam
+    type: select
+    proxies: *group_candidates
+  - name: OneDrive
+    type: select
+    proxies: *group_candidates
+  - name: 微软服务
+    type: select
+    proxies: *group_candidates
+  - name: 国内
+    type: select
+    proxies:
+      - DIRECT
+      - 节点选择
+      - 香港
+      - 台湾
+      - 日本
+      - 新加坡
+      - 美国
+      - 其它地区
+      - 全部节点
+      - 自动选择
+  - name: 其他
+    type: select
+    proxies: *group_candidates
+  - name: 香港
+    type: url-test
+    use: &sub_all
+      - 订阅一
+    filter: "(?i)港|hk|hongkong|hong kong"
+  - name: 台湾
+    type: url-test
+    use: *sub_all
+    filter: "(?i)台|tw|taiwan"
+  - name: 日本
+    type: url-test
+    use: *sub_all
+    filter: "(?i)日本|jp|japan"
+  - name: 美国
+    type: url-test
+    use: *sub_all
+    filter: "(?i)美|us|unitedstates|united states"
+  - name: 新加坡
+    type: url-test
+    use: *sub_all
+    filter: "(?i)(新|sg|singapore)"
+  - name: 其它地区
+    type: url-test
+    use: *sub_all
+    filter: "(?i)^(?!.*(🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|sg|singapore|美|us|unitedstates)).*"
+  - name: 全部节点
+    type: url-test
+    use: *sub_all
+  - name: 自动选择
+    type: url-test
+    use: *sub_all
+    tolerance: 2
+
+rules:
+  - RULE-SET,direct,DIRECT
+  - GEOSITE,category-public-tracker,DIRECT
+  - RULE-SET,reject,广告拦截
+  - RULE-SET,AWAvenue-Ads,广告拦截
+  - RULE-SET,ai,境外AI
+  - RULE-SET,youtube,YouTube
+  - RULE-SET,google,Google
+  - RULE-SET,telegram,Telegram
+  - RULE-SET,github,Github
+  - RULE-SET,apple,Apple
+  - RULE-SET,microsoft,微软服务
+  - GEOSITE,apple,Apple
+  - GEOSITE,apple-cn,Apple
+  - GEOSITE,github,Github
+  - GEOSITE,twitter,Twitter
+  - GEOSITE,youtube,YouTube
+  - GEOSITE,google,Google
+  - GEOSITE,google-cn,Google
+  - GEOSITE,telegram,Telegram
+  - GEOSITE,netflix,NETFLIX
+  - GEOSITE,tiktok,TikTok
+  - GEOSITE,steam@cn,DIRECT
+  - GEOSITE,steam,Steam
+  - GEOSITE,onedrive,OneDrive
+  - GEOSITE,microsoft,微软服务
+  - GEOSITE,geolocation-!cn,其他
+  - GEOIP,google,DIRECT
+  - GEOIP,netflix,DIRECT
+  - GEOIP,telegram,DIRECT
+  - GEOIP,twitter,DIRECT
+  - GEOSITE,CN,国内
+  - GEOIP,CN,DIRECT
+  - PROCESS-NAME,aria2c,DIRECT
+  - PROCESS-NAME,BitComet,DIRECT
+  - PROCESS-NAME,fdm,DIRECT
+  - PROCESS-NAME,NetTransport,DIRECT
+  - PROCESS-NAME,qbittorrent,DIRECT
+  - PROCESS-NAME,Thunder,DIRECT
+  - PROCESS-NAME,transmission-daemon,DIRECT
+  - PROCESS-NAME,transmission-qt,DIRECT
+  - PROCESS-NAME,uTorrent,DIRECT
+  - PROCESS-NAME,WebTorrent,DIRECT
+  - PROCESS-NAME,Folx,DIRECT
+  - PROCESS-NAME,Transmission,DIRECT
+  - PROCESS-NAME,WebTorrent Helper,DIRECT
+  - PROCESS-NAME,v2ray,DIRECT
+  - PROCESS-NAME,ss-local,DIRECT
+  - PROCESS-NAME,ssr-local,DIRECT
+  - PROCESS-NAME,ss-redir,DIRECT
+  - PROCESS-NAME,ssr-redir,DIRECT
+  - PROCESS-NAME,ss-server,DIRECT
+  - PROCESS-NAME,trojan-go,DIRECT
+  - PROCESS-NAME,xray,DIRECT
+  - PROCESS-NAME,hysteria,DIRECT
+  - PROCESS-NAME,singbox,DIRECT
+  - PROCESS-NAME,UUBooster,DIRECT
+  - PROCESS-NAME,uugamebooster,DIRECT
+  - DST-PORT,80,其他
+  - DST-PORT,443,其他
+  - MATCH,DIRECT

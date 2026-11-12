@@ -1,0 +1,19 @@
+# Only a runnable configuration SHAPE; add your real nodes/providers locally.
+mixed-port: 7890
+allow-lan: true
+mode: rule
+external-controller: 127.0.0.1:9090
+secret: replace-locally
+proxy-groups:
+  - name: AI
+    type: select
+    proxies: [DIRECT]
+  - name: GOOGLE
+    type: select
+    proxies: [DIRECT]
+  - name: TELEGRAM
+    type: select
+    proxies: [DIRECT]
+  - name: 默认策略
+    type: select
+    proxies: [DIRECT]

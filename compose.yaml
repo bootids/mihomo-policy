@@ -1,0 +1,29 @@
+services:
+  mihomo-policy:
+    build: .
+    image: mihomo-policy:local
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_BIND:-127.0.0.1}:${DASHBOARD_PORT:-18091}:8080"
+    environment:
+      MIHOMO_SECRET: "${MIHOMO_SECRET:?Set MIHOMO_SECRET}"
+      MIHOMO_DASHBOARD_PASSWORD: "${MIHOMO_DASHBOARD_PASSWORD:?Set MIHOMO_DASHBOARD_PASSWORD}"
+      MIHOMO_SUB_URL: "${MIHOMO_SUB_URL:-}"
+    command: ["serve", "--config", "/app/local/runtime.yaml"]
+    volumes:
+      - ./local:/app/local:ro
+      - ./policy:/app/policy
+      - policy-data:/app/data
+    tmpfs:
+      - /tmp
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+volumes:
+  policy-data:

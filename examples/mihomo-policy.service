@@ -1,0 +1,23 @@
+[Unit]
+Description=Mihomo policy collector and analyzer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mihomo-policy
+Group=mihomo-policy
+WorkingDirectory=/opt/mihomo-policy
+EnvironmentFile=/etc/mihomo-policy/environment
+ExecStart=/opt/mihomo-policy/bin/mihomo-policy serve --config /opt/mihomo-policy/local/runtime.yaml
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/mihomo-policy/data
+
+[Install]
+WantedBy=multi-user.target

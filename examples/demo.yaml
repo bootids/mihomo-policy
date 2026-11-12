@@ -1,0 +1,5 @@
+# Offline fixture import/report demo. No controller or proxy is contacted.
+source: home
+database: ../data/demo.db
+policy_file: ../policy/policy.yaml
+report_file: ../data/demo-report.json
